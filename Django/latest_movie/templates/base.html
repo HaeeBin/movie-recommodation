@@ -1,0 +1,36 @@
+<!-- 표준 html 형식으로 맞춤 -->
+{% load static %}
+<!doctype html>
+<html lang="ko">
+<head>
+    <!-- HTML 문서의 문자 인코딩을 정의합니다. utf-8은 문자 집합(Encoding)으로서, 
+        대부분의 텍스트와 문자를 처리하는 데 사용되는 광범위한 유니코드 문자 세트 -->
+    <meta charset="utf-8">
+    <!-- 뷰포트는 사용자가 웹 페이지를 보는 디바이스 화면의 영역을 나타냅니다. 
+    width=device-width는 뷰포트의 너비를 디바이스의 화면 너비에 맞추라는 의미 
+    
+    initial-scale=1 웹 페이지가 초기 로딩 시 100% 배율로 표시되도록 설정
+    shrink-to-fit=no 뷰포트가 작을 때 텍스트가 자동으로 축소되지 않도록 설정-->
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <!-- 부트 스트랩 CSS 연결 -->
+    <link rel="stylesheet" type="text/css" href="{% static 'bootstrap.min.css' %}">
+    <title>Hello!</title>
+
+</head>
+
+<body>
+<!-- 네비게이션바 html 연결 -->
+{% include "navbar.html" %}
+<!-- 기본 템플릿 안에 삽입될 내용 Start -->
+{% block content %}
+<!-- 기본 템플릿 안에 삽입될 내용 End -->
+{% endblock %}
+<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+<!--메뉴버튼 사용위해 Bootstrap JS 연결 -->
+<script src="{% static 'bootstrap.min.js' %}"></script>
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+</body>
+</html>

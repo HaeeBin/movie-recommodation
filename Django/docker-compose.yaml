@@ -1,0 +1,56 @@
+version: '3'
+
+services:
+  
+  web:
+    build:
+      context: .
+      dockerfile: ./latest_movie/dockerfile
+    env_file:
+      - ./latest_movie/.env
+    ports:
+      - "8000:8000"
+    # 자동 마이그레이트, static 파일 모으기,서버실행
+    command: bash -c "python manage.py makemigrations djan --noinput && python manage.py makemigrations --noinput && python manage.py migrate --noinput && python manage.py collectstatic --noinput && python manage.py runserver 0.0.0.0:8000"
+    
+    # static파일 nginx와 공유
+    volumes:
+      - static_volume:/app/static
+      - ./latest_movie/djan/migrations:/app/djan/migrations
+    depends_on:
+      - db
+    networks:
+      net:
+
+
+  nginx:
+    build:
+      context: .
+      dockerfile: ./latest_movie/dockerfile.n
+    # web 컨테이너와 static의 경로가 달라서 고생했었음
+    volumes:
+      - static_volume:/static
+    ports:
+      - 80:80
+    depends_on:
+      - web
+    networks:
+      net:
+
+  db:
+    image: postgres
+    volumes:
+      - postgresDB:/var/lib/postgresql/data
+    #environment:
+    # - POSTGRES_PASSWORD=postgrespwd
+    networks:
+      net:
+
+networks:
+  net:
+
+volumes:
+  static_volume:
+  postgresDB:
+
+  

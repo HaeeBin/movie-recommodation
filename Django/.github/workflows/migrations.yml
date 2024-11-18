@@ -1,0 +1,22 @@
+name: Check migrations
+
+on:
+  push:
+    branches: [main, develop]
+    paths:
+      - 'latest_movie/djan/migrations/**'
+  # pull_request:
+  #   branches: [main, develop]
+  #   paths:
+  #     - 'latest_movie/djan/migrations/**'
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Notify Slack on Change
+        if: ${{ github.event_name == 'push' || github.event_name == 'pull_request' }}
+        run: |
+          curl -X POST -H 'Content-type: application/json' --data '{"text":"장고 DB에 변화가 있습니다. 장고 git pull 해주세요!"}' ${{ secrets.SLACK_WEBHOOK_URL }}

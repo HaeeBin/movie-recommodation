@@ -1,0 +1,93 @@
+<!-- 영화 일정이 나오는 메인화면입니다. -->
+
+<!-- 기본 html 형식과 연결-->
+{% extends 'base.html' %}
+{% block content %}
+<div class="container my-3">
+    <h2>일간 박스오피스</h2>
+    <table class="table">
+        <!-- <thead>는 HTML 테이블의 헤더(제목) 부분을 정의 -->
+        <thead>
+        <!-- <tr> 테이블 내부에서 행을 정의 -->
+        <tr class="table-primary">
+            <!-- <th> 요소는 테이블의 헤더 셀의 요소 -->
+            <th>랭킹</th>
+            <th>순위변화</th>
+            <th>영화</th>
+            <th>누적관객수</th>
+            <th>스크린당 관객수</th>
+            <th>장르</th>
+            <th>상영시간</th>
+            <th>개봉일</th>
+        </tr>
+        </thead>
+
+        <tbody>
+        <!-- 만약 영화가 있다면  -->
+        {% if movie_list %}
+        <!-- 영화를 모두 표시 -->
+        {% for movie in movie_list %}
+            {% if movie.rank <= 10 %}
+                <tr>
+                    <!-- <td> 요소는 테이블의 데이터 셀 -->
+                    <td>{{ movie.rank }}</td>
+                    <td>{{ movie.rank_intensity }}</td>
+                    <td>
+                        <!-- 영화를 누르면 상세페이지 들어갈수 있다. 상세페이지는
+                        movie_code 값들로 링크가 설정돼 있다. -->
+                        {% if movie.movie_code %}
+                            <a href="{% url 'djan:detail' movie.movie_code %}">{{ movie.korean_name }}</a>
+                        {% else %}
+                            {{ movie.korean_name }}
+                        {% endif %}
+                    </td>
+                    <td>{{ movie.audiacc }}</td>
+                    <td>{{ movie.audicnt_showcnt }}</td>
+                    <td>{{ movie.genre }}</td>
+                    <td>{{ movie.running_time }}</td>
+                    <td>{{ movie.open_date }}</td>
+
+                </tr>
+            {% endif %}
+        {% endfor %}
+        <!-- 영화가 없다면 -->
+        {% else %}
+        <tr>
+            <td colspan="3">영화가 없습니다.</td>
+        </tr>
+        {% endif %}
+        </tbody>
+    </table>
+    
+    <!-- 탭 메뉴 -->
+    <ul class="nav nav-tabs" id="trendTab" role="tablist">
+        <li class="nav-item">
+            <a class="nav-link active" id="trend1-tab" data-toggle="tab" href="#trend1" role="tab" aria-controls="trend1" aria-selected="true">1~5위 검색량</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" id="trend2-tab" data-toggle="tab" href="#trend2" role="tab" aria-controls="trend2" aria-selected="false">6~10위 검색량</a>
+        </li>
+    </ul>
+
+    <!-- 탭 컨텐츠 -->
+    <div class="tab-content mt-4" id="trendTabContent">
+        <div class="tab-pane fade show active" id="trend1" role="tabpanel" aria-labelledby="trend1-tab">
+            <h3>한달간 검색 트래픽</h3>
+            <div class="image-container">   
+                <img src="{{ trend_url1 }}" class="trend-img" alt="1~5위 한달 검색량">
+            </div>
+        </div>
+        <div class="tab-pane fade" id="trend2" role="tabpanel" aria-labelledby="trend2-tab">
+            <h3>한달간 검색 트래픽</h3>
+            <div class="image-container">
+                <img src="{{ trend_url2 }}" class="trend-img" alt="6~10위 한달 검색량">
+            </div>
+        </div>
+    </div>
+
+    <!-- 탭 메뉴 -->
+
+    </div>
+</div>
+
+{% endblock %}

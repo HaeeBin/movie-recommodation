@@ -1,0 +1,105 @@
+<!-- 기본 html 형식과 연결-->
+{% extends 'base.html' %}
+{% block content %}
+    <div class="container">
+        <h1 class="mt-4">랭킹 페이지</h1>
+        <!-- 탭 메뉴 -->
+        <ul class="nav nav-tabs" id="rankingTab" role="tablist">
+            <li class="nav-item">
+                <a class="nav-link active" id="director-tab" data-toggle="tab" href="#director" role="tab" aria-controls="director" aria-selected="true">감독별 랭킹</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="actor-tab" data-toggle="tab" href="#actor" role="tab" aria-controls="actor" aria-selected="false">배우별 랭킹</a>
+            </li>
+        </ul>
+
+        <!-- 탭 컨텐츠 -->
+        <div class="tab-content mt-4" id="rankingTabContent">
+            <!-- 감독별 랭킹 탭 -->
+            <div class="tab-pane fade show active" id="director" role="tabpanel" aria-labelledby="director-tab">
+                <h3>믿고보는 감독 순위</h3>
+                <table class="table">
+                    <!-- <thead>는 HTML 테이블의 헤더(제목) 부분을 정의 -->
+                    <thead>
+                    <!-- <tr> 테이블 내부에서 행을 정의 -->
+                    <tr class="table-primary">
+                        <!-- <th> 요소는 테이블의 헤더 셀의 요소 -->
+                        <th>랭킹</th>
+                        <th>영화감독</th>
+                        <th>평균관객수</th>
+                        <th>스크린당 관객수</th>
+                    </tr>
+                    </thead>
+                    
+                    <tbody>
+                    <!-- 만약 영화가 있다면  -->
+                    {% if trusted_directors %}
+                    <!-- 영화를 모두 표시 -->
+                    {% for director in trusted_directors %}
+                        {% if forloop.counter <= 10 %}
+                            <tr>
+                                <!-- <td> 요소는 테이블의 데이터 셀 -->
+                                <td>{{ forloop.counter }}</td> 
+                                <td>{{ director.director }}</td>
+                                <td>{{ director.average_audience }}</td>
+                                <td>{{ director.audience_showcnt|floatformat:1  }}</td>
+                            </tr>
+                        {% endif %}
+                    {% endfor %}
+                    
+                    <!-- 영화가 없다면 -->
+                    {% else %}
+                    <tr>
+                        <td colspan="3">영화가 없습니다.</td>
+                    </tr>
+                    {% endif %}
+                    </tbody>
+                </table>
+                <!-- 여기에 감독별 랭킹 데이터를 표시할 내용 추가 -->
+            </div>
+            <!-- 배우별 랭킹 탭 -->
+            <div class="tab-pane fade" id="actor" role="tabpanel" aria-labelledby="actor-tab">
+                <h3>믿고보는 배우 순위</h3>
+                <table class="table">
+                    <!-- <thead>는 HTML 테이블의 헤더(제목) 부분을 정의 -->
+                    <thead>
+                    <!-- <tr> 테이블 내부에서 행을 정의 -->
+                    <tr class="table-primary">
+                        <!-- <th> 요소는 테이블의 헤더 셀의 요소 -->
+                        <th>랭킹</th>
+                        <th>배우</th>
+                        <th>평균관객수</th>
+                        <th>스크린당 관객수</th>
+                    </tr>
+                    </thead>
+                    
+                    <tbody>
+                    <!-- 만약 영화가 있다면  -->
+                    {% if trusted_actors %}
+                    <!-- 영화를 모두 표시 -->
+                    {% for actor in trusted_actors %}
+                        {% if forloop.counter <= 10 %}
+                            <tr>
+                                <!-- <td> 요소는 테이블의 데이터 셀 -->
+                                <td>{{ forloop.counter }}</td> 
+                                <td>{{ actor.actor }}</td>
+                                <td>{{ actor.avg_audience }}</td>
+                                <td>{{ actor.audience_showcnt|floatformat:1  }}</td>
+                            </tr>
+                        {% endif %}
+                    {% endfor %}
+                    
+                    <!-- 영화가 없다면 -->
+                    {% else %}
+                    <tr>
+                        <td colspan="3">영화가 없습니다.</td>
+                    </tr>
+                    {% endif %}
+                    </tbody>
+                </table>
+                <!-- 여기에 감독별 랭킹 데이터를 표시할 내용 추가 -->
+                <!-- 여기에 배우별 랭킹 데이터를 표시할 내용 추가 -->
+            </div>
+        </div>
+    </div>
+{% endblock %}

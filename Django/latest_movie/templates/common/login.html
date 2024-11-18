@@ -1,0 +1,40 @@
+<!-- djan뿐 아니라 다른곳에도 활용하려고 common 폴더에 적용 -->
+
+{% extends "base.html" %}
+{% block content %}
+<!-- container와 my-3을 사용하여 간격을 조절하고 컨테이너 스타일을 적용 -->
+<div class="container my-3">
+    <!-- 로그인 버트 눌렀을때(post) "{% url 'common:login' %}"은 해당 폼이
+    제출될 때 어떤 URL로 이동할지를 지정 -->
+    <form method="post" action="{% url 'common:login' %}">
+        {% csrf_token %}
+        <!-- 로그인 성공후 보이지 않는 숨겨진 입력 필드에 next 값이 input됨, 
+        {{ next }}는 Django 템플릿 엔진의 문법.해당 템플릿이 렌더링될 때 
+        next라는 변수의 값을 사용. 이 경우, 로그인 후에 사용자를 리디렉션할
+        페이지의 URL 예> '질문 등록하기'를 눌러 회원가입이 뜬경우 되돌아감-->
+        <input type="hidden" name="next" value="{{ next }}">
+        <!-- 로그인 에러 템플릿 연결 -->
+        {% include "form_errors.html" %}
+        <!-- 아이디 입력부분 -->
+        <div class="mb-3">
+            <label for="username">사용자ID</label>
+            <!-- 로그인 실패시 사용자가 이전에 입력한 값을 유지. -->
+            <!-- form-control 클래스는 입력 필드의 폭을 100%로 설정하고, 일관된 높이를 제공 -->
+            <input type="text" class="form-control" name="username" id="username"
+                value="{{ form.username.value|default_if_none:'' }}">
+        </div>
+        <!-- 비밀번호 입력부분 -->
+        <div class="mb-3">
+            <label for="password">비밀번호</label>
+            <input type="password" class="form-control" name="password" id="password"
+                value="{{ form.password.value|default_if_none:'' }}">
+        </div>
+        <!-- 로그인 버튼 생성 -->
+        <button type="submit" class="btn btn-primary">로그인</button>
+    </form>
+
+    <p class="mt-3">
+        <a href="{% url 'common:password_reset' %}">비밀번호를 잊으셨나요?</a>
+    </p>
+</div>
+{% endblock %}

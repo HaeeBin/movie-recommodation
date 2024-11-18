@@ -1,0 +1,27 @@
+# 베이스 이미지 설정
+FROM python:3.8
+
+ENV PYTHONDONTWRITEBYTECODE 1
+ENV PYTHONUNBUFFERED=1
+
+RUN apt-get update \
+    && rm -rf /var/lib/apt/lists/*
+
+# 현재 디렉토리의 모든 파일을 컨테이너의 /app 디렉토리로 복사
+COPY ../latest_movie /app/
+
+# 작업 디렉토리 설정
+WORKDIR /app
+
+COPY latest_movie/requirements.txt ./
+
+
+RUN pip install --upgrade pip
+
+# 필요한 패키지 설치
+# 캐시된 패키지를 사용하지 않고 매번 새로운 패키지를 다운로드하여 
+# 설치합니다. 이는 Docker 이미지를 더욱 경량화하고, Docker 
+# 레이어의 크기를 줄이는 데 도움
+RUN pip install -r requirements.txt
+
+COPY . .

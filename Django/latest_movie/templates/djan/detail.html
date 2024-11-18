@@ -1,0 +1,156 @@
+<!-- 기본 html 형식과 연결-->
+{% extends 'base.html' %}
+{% block content %}
+
+<!-- 댓글창 스타일 정의 -->
+<style>
+    .ntextarea {
+        width: 1000px; /* 원하는 가로 크기 지정 */
+        overflow: auto; /* 스크롤 바가 필요한 경우 나타나도록 설정 */
+    }
+</style>
+
+<div class="container my-3">
+    <!-- 카드 레이아웃 my-3는 상하여백 -->
+    <div class="card my-3">
+        <h2 class="border-bottom py-2">{{ movie.korean_name }}</h2>
+        <div class="row no-gutters">
+            <div class="col-md-4">
+                <img src="{{ info.poster }}" class="card-img" alt="{{ movie.korean_name }}">
+            </div>
+            <div class="col-md-8">
+                <div class="card-body">
+                <!-- 카드 내용 넣는곳 "white-space: pre-line;" 스타일은 텍스트 
+                줄바꿈을 유지하도록 합니다.-->
+                <!-- py는 상하 패딩을 의미하고, 2는 패딩의 크기를 나타냄. 즉 2의 크기를 가진 패딩 적용 -->
+                <!-- <div class="card-text ntextarea" style="white-space: pre-line;">{{ movie.content }}</div> -->
+                <div class="d-flex justify-content-end">
+                <!-- "badge" 클래스를 사용하여 부가 정보를 표시합니다. "bg-light" 클래스는
+                배경색을 밝게 지정하고, "text-dark" 클래스는 텍스트 색상을 어두운 색상지정.
+                배지의 패딩을 설정하는 클래스로, 위아래 및 좌우에 모두 2단위의 패딩이 적용-->
+                    <div class="badge bg-light text-dark p-2">
+                        {{ movie.open_date }}
+                    </div>
+                </div>
+                <div class="card-text ntextarea" style="white-space: pre-line;">
+                    <strong>줄거리</strong>  {{ info.story }}
+
+                    <strong> 개봉 날짜</strong> {{ movie.open_date }}
+
+                    <strong>이용 가능 연령</strong> {{ info.accessible }}
+
+                    <strong>장르</strong> {{ movie.genre }}
+
+                    <strong>관람 시간</strong> {{ movie.running_time}}
+
+                    <strong>국가</strong> {{info.country}}
+
+                    <strong>배급사</strong> {{ info.company }}
+                    {% if image_url %}
+                        <img src="{{ image_url }}" class="card-img" alt="Movie Image">
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    <br>
+
+    
+
+    <!-- views 에 vote 연결 -->
+    {% if user.is_authenticated %}
+        {% if not rating and allow_vote %}
+            <form action="{% url 'djan:vote' movie.movie_code %}" method="post">
+                {% csrf_token %}
+                <br>
+                {% if error_message %}
+                    <p><strong>{{ error_message }}</strong></p>
+                {% endif %}
+                <h4>이거 영화관에서 볼만한가요?</h4>
+                {% for choice in movie.choice_set.all|dictsort:'choice_text' %}
+                    <input type="radio" name="choice" id="choice{{ forloop.counter }}" value="{{ choice.id }}">
+                    <label for="choice{{ forloop.counter }}">
+                        {{ choice.choice_text }}
+                    </label>
+                    &nbsp;&nbsp;
+                {% endfor %}
+                <input type="submit" value="Vote">
+            </form>
+        {% else %}
+            <p>{{ error_message }}</p>
+            <h4>현재 투표수</h4>
+            <p>
+                {% for choice in movie.choice_set.all|dictsort:'choice_text' %}
+                    {{ choice.choice_text }} : {{ choice.votes }} 표 &nbsp;&nbsp;
+                {% endfor %}
+            </p>
+
+            {% if average_rate %}
+            <h4>평균 점수</h4> {{ average_rate }}
+            {% endif %}
+        {% endif %}
+    {% else %}
+        <!-- 로그인하지 않은 경우 안내 메시지 표시 -->
+        <h4>로그인 후 투표하실 수 있습니다.</h4>
+    {% endif %}
+
+    <!-- 이미 투표에 참여했다면 -->
+    <!--{% if user.is_authenticated and not user_rating %}
+        {% if error_message %}
+            <p>{{ error_message }}</p>
+        {% endif %}
+    {% endif %} -->
+
+    <br><br>
+    <!-- 현재 댓글창 출력 -->
+    <h9 class="border-bottom my-3 py-2">{{movie.answer_set.count}}개의 댓글이 있습니다.</h9>
+    <br>
+    {% for answer in movie.answer_set.all %}
+        [{{ answer.answer_date }}]&nbsp&nbsp&nbsp {{ answer.author.username }} : {{ answer.content }}
+        <br>
+    {% endfor %}
+    <!-- 댓글 등록 -->
+    {% if user.is_authenticated %}
+        <form action="{% url 'djan:answer_create' movie.movie_code %}" method="post" class="my-3">
+            {% csrf_token %}
+
+            <!-- 오류표시 Start -->
+            {% include "form_errors.html" %}
+
+            <!-- 하위 요소들을 수평으로 배치하기 위한 Flexbox 레이아웃 -->
+            <div class="d-flex">
+                <!-- textarea는 우선 로그인 상태에서만 접근가능하고,텍스트 입력란
+                ntextarea 클래스는 사용자 정의 CSS 스타일을 적용
+                rows 속성은 입력란의 초기 행 수를 1로 설정
+                onkeypress 이벤트 핸들러를 등록, 이벤트 타겟은 아래에 정의됨 -->
+                <textarea 
+                    name="content" id="content" class="form-control" rows="1" onkeypress="submitOnEnter(event)"></textarea>
+                <!-- btn btn-primary 클래스는 부트스트랩에서 제공하는 버튼 스타일 -->
+                <input type="submit" value="등록" class="btn btn-primary" rows="5">
+            </div>
+        </form>
+    
+    <!-- 엔터를 눌러도 댓글이 등록되게 자바스크립트 코드 추가-->
+        <script>
+            function submitOnEnter(event) {
+                // 쉬프트와 함께누르면 일반 줄바꿈으로 인식
+                if (event.key === 'Enter' && !event.shiftKey) {
+                    // 아무것도 입력하지 않고 등록하려고하면 막음
+                    if (event.target.value.trim() === ''){
+                        alert('텍스트를 입력하세요.')}
+                    // 입력된 텍스트가 비어있지 않은 경우
+                    else{
+                        // 이벤트(enter)의 기본 동작(submit)을 방지합니다. 
+                        event.preventDefault();
+                        // 사용자가 직접 제출 버튼을 누르지 않고 JavaScript 코드를
+                        // 사용하여 폼을 서버에 제출
+                        event.target.form.submit();
+                    }
+                }
+            }
+        </script>
+    {% else %}
+        <p>로그인 후 댓글을 작성할 수 있습니다.</p>
+    {% endif %}
+</div>
+{% endblock %}
